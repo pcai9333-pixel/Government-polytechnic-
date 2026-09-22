@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A0F1F">
+<title>Government Polytechnic College, Perundurai — Fee Payment</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230A0F1F'/%3E%3Ctext x='50' y='66' font-size='54' text-anchor='middle' fill='%23E4B84A'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#0A0F1F;
+    --grid-line: rgba(99,179,237,0.07);
+    --panel: rgba(255,255,255,0.035);
+    --panel-strong: rgba(255,255,255,0.06);
+    --panel-border: rgba(148,163,184,0.16);
+    --text:#E7ECF5;
+    --text-muted:#93A0B8;
+    --text-faint:#5D6B85;
+    --blue:#3B82F6;
+    --blue-soft:#60A5FA;
+    --gold:#E4B84A;
+    --success:#22C55E;
+    --success-soft:#34D399;
+    --warning:#F5A623;
+    --danger:#F87171;
+    --mono: ui-monospace, 'Roboto Mono', 'SFMono-Regular', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --r-lg: 20px;
+    --r-md: 14px;
+    --r-sm: 10px;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    -webkit-tap-highlight-color: transparent;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .grid-bg{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    background:
+      radial-gradient(circle at 50% -10%, rgba(59,130,246,0.14), transparent 55%),
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px),
+      var(--bg);
+    background-size: auto, 28px 28px, 28px 28px, auto;
+  }
+
+  .app-shell{
+    max-width: 460px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    display:flex;
+    flex-direction:column;
+    padding: 20px 18px 12px;
+  }
+
+  main{ flex:1; }
+
+  /* Screens */
+  .screen{ display:none; }
+  .screen.active{ display:block; animation: screenIn .38s ease; }
+  @keyframes screenIn{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
+
+  /* Step indicator */
+  .steps{
+    display:flex; align-items:center; gap:8px;
+    margin: 4px 0 26px;
+  }
+  .steps .seg{
+    flex:1; height:3px; border-radius:2px;
+    background: var(--panel-border);
+    position:relative;
+  }
+  .steps .seg.done, .steps .seg.current{ background: var(--blue); }
+  .steps .seg.current{ background: linear-gradient(90deg, var(--blue), var(--gold)); }
+  .step-labels{ display:flex; justify-content:space-between; font-size:.72rem; color:var(--text-faint); margin-top:6px; }
+  .step-labels span.current{ color: var(--gold); font-weight:600; }
+
+  /* Back button */
+  .back-btn{
+    background:none; border:none; color:var(--text-muted);
+    font-size:.95rem; padding:6px 0 18px; display:flex; align-items:center; gap:6px;
+    cursor:pointer;
+  }
+  .back-btn:active{ color:var(--blue-soft); }
+
+  /* Welcome screen */
+  .welcome-hero{
+    text-align:center;
+    padding: 10vh 0 4vh;
+  }
+  .badge-ring{
+    width:96px; height:96px; margin:0 auto 26px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(circle, rgba(228,184,74,0.16), transparent 70%);
+    position:relative;
+  }
+  .badge-ring::before{
+    content:"";
+    position:absolute; inset:0;
+    border-radius:50%;
+    border:1px solid rgba(228,184,74,0.35);
+    animation: pulseRing 2.6s ease-out infinite;
+  }
+  @keyframes pulseRing{
+    0%{ transform:scale(0.85); opacity:.9; }
+    70%{ transform:scale(1.35); opacity:0; }
+    100%{ opacity:0; }
+  }
+  .badge-ring span{ font-size:2.4rem; }
+  .greet{ font-size:1.1rem; color:var(--text-muted); margin:0 0 10px; }
+  .college-name{
+    font-size:1.9rem; font-weight:800; line-height:1.25;
+    margin:0 0 12px;
+    letter-spacing:-0.01em;
+  }
+  .college-name .place{ color: var(--gold); }
+  .tagline{ color:var(--text-faint); font-size:.9rem; margin:0; }
+
+  /* Buttons */
+  .btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; border:none; border-radius: var(--r-md);
+    padding:17px 18px; font-size:1.05rem; font-weight:700;
+    font-family: inherit; cursor:pointer;
+    color:#08111F;
+    transition: transform .12s ease;
+  }
+  .btn:active{ transform: scale(0.98); }
+  .btn-primary{
+    background: linear-gradient(135deg, #2563EB, #06B6D4);
+    color:#F5FAFF;
+    box-shadow: 0 10px 30px -12px rgba(37,99,235,0.65);
+  }
+  .btn-pay{
+    background: linear-gradient(135deg, #16A34A, #22C55E);
+    color:#F0FFF6;
+    box-shadow: 0 10px 30px -12px rgba(22,163,74,0.6);
+    font-size:1.15rem;
+  }
+  .btn-ghost{
+    background: var(--panel-strong);
+    border:1px solid var(--panel-border);
+    color: var(--text);
+  }
+  .btn-outline-danger{
+    background:transparent;
+    border:1px solid rgba(248,113,113,0.4);
+    color: var(--danger);
+  }
+  .btn-sm{ padding:11px 14px; font-size:.9rem; }
+
+  /* Cards / panels */
+  .card{
+    background: var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius: var(--r-lg);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 18px;
+    margin-bottom:16px;
+  }
+  .card h2{ margin:0 0 4px; font-size:1.05rem; font-weight:700; }
+  .card .hint{ margin:0 0 16px; font-size:.82rem; color:var(--text-faint); }
+
+  h1.screen-title{ font-size:1.5rem; font-weight:800; margin:0 0 4px; letter-spacing:-0.01em; }
+  .screen-sub{ color:var(--text-muted); font-size:.88rem; margin:0 0 22px; }
+
+  /* Fee amount block (not a card, deliberately different treatment) */
+  .fee-block{ text-align:center; padding: 6px 0 22px; border-bottom:1px solid var(--panel-border); margin-bottom:22px; }
+  .fee-amount{
+    font-family: var(--mono); font-size:2.9rem; font-weight:800;
+    color: var(--gold); letter-spacing:-0.02em; margin:4px 0 8px;
+  }
+  .fee-year{ color:var(--text-muted); font-size:.9rem; }
+
+  /* Form fields */
+  .field{ margin-bottom:14px; }
+  .field label{
+    display:block; font-size:.8rem; font-weight:600;
+    color: var(--text-muted); margin-bottom:6px;
+  }
+  .field input, .field select{
+    width:100%; padding:13px 14px; font-size:16px;
+    background: var(--panel-strong); border:1px solid var(--panel-border);
+    border-radius: var(--r-sm); color: var(--text); font-family:inherit;
+  }
+  .field input::placeholder{ color: var(--text-faint); }
+  .field-row{ display:flex; gap:12px; }
+  .field-row .field{ flex:1; }
+  .form-error{ color: var(--danger); font-size:.85rem; margin: -4px 0 14px; min-height:1em; }
+
+  /* Payment summary strip */
+  .pay-summary{
+    font-family: var(--mono); font-size:.8rem; color:var(--text-muted);
+    background: var(--panel-strong); border:1px solid var(--panel-border);
+    border-radius: var(--r-sm); padding:10px 12px; margin-bottom:22px;
+    line-height:1.6; word-break:break-word;
+  }
+  .pay-summary b{ color:var(--text); }
+
+  /* Config warning */
+  .warn-banner{
+    display:flex; gap:10px; align-items:flex-start;
+    background: rgba(245,166,35,0.1); border:1px solid rgba(245,166,35,0.35);
+    color:#FBD38D; border-radius: var(--r-md); padding:12px 14px; margin-bottom:20px;
+    font-size:.85rem; line-height:1.5;
+  }
+
+  /* UPI method grid */
+  .upi-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px;
+  }
+  .upi-btn{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    padding:18px 10px; border-radius: var(--r-md); border:1px solid var(--panel-border);
+    font-family:inherit; font-weight:700; font-size:.9rem; color:var(--text);
+    cursor:pointer;
+  }
+  .upi-btn .em{ font-size:1.6rem; }
+  .upi-btn.gpay{ background: rgba(34,197,94,0.08); border-color:rgba(34,197,94,0.28); }
+  .upi-btn.phonepe{ background: rgba(59,130,246,0.08); border-color:rgba(59,130,246,0.28); }
+  .upi-btn.paytm{ background: rgba(168,85,247,0.08); border-color:rgba(168,85,247,0.28); }
+  .upi-btn.other{ background: var(--panel-strong); }
+  .upi-btn:active{ transform: scale(0.97); }
+
+  .fallback-msg{
+    display:none;
+    background: rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.35);
+    color:#FCA5A5; border-radius: var(--r-md); padding:13px 14px; margin: 4px 0 20px;
+    font-size:.86rem; line-height:1.55;
+  }
+  .fallback-msg.show{ display:block; }
+
+  .divider{
+    display:flex; align-items:center; gap:12px; color:var(--text-faint);
+    font-size:.8rem; margin: 6px 0 20px;
+  }
+  .divider::before, .divider::after{ content:""; flex:1; height:1px; background: var(--panel-border); }
+
+  /* Bank details — ledger style, deliberately not a glass card */
+  .ledger{ border:1px solid var(--panel-border); border-radius: var(--r-md); overflow:hidden; margin-bottom:24px; }
+  .ledger-row{ padding:14px 16px; border-bottom:1px solid var(--panel-border); }
+  .ledger-row:last-child{ border-bottom:none; }
+  .ledger-label{ font-size:.78rem; color:var(--text-faint); margin-bottom:4px; }
+  .ledger-value{ font-family: var(--mono); font-size:1rem; color:var(--text); word-break:break-all; margin-bottom:10px; }
+  .copy-btn{
+    background:transparent; border:1px solid rgba(96,165,250,0.4); color:var(--blue-soft);
+    border-radius: var(--r-sm); padding:9px 12px; font-size:.82rem; font-weight:700;
+    font-family:inherit; width:100%; cursor:pointer;
+  }
+  .copy-btn.copied{ border-color: rgba(34,197,94,0.5); color: var(--success-soft); }
+
+  /* QR — blueprint dashed frame, deliberately different from cards */
+  .qr-section{ margin-bottom:24px; }
+  .qr-frame{
+    border:2px dashed rgba(96,165,250,0.4); border-radius: var(--r-md);
+    padding:18px; display:flex; align-items:center; justify-content:center;
+    min-height:180px; background: rgba(96,165,250,0.04);
+  }
+  .qr-frame img{ max-width:100%; max-height:260px; border-radius:8px; display:block; }
+  .qr-missing{ text-align:center; color:var(--text-faint); font-size:.84rem; line-height:1.6; padding: 10px; }
+  .qr-missing code{ color:var(--blue-soft); font-family:var(--mono); }
+
+  /* Status card */
+  .status-card{ scroll-margin-top: 30px; }
+  .status-card.pulse{ animation: pulseCard 1.5s ease; }
+  @keyframes pulseCard{ 0%,100%{ box-shadow:none; } 30%{ box-shadow: 0 0 0 3px rgba(228,184,74,0.4); } }
+  .status-actions{ display:flex; gap:12px; margin-top:6px; }
+  .status-actions .btn{ flex:1; }
+
+  .ref-form{ display:none; margin-top:16px; }
+  .ref-form.show{ display:block; }
+  .not-yet-msg{ display:none; color:var(--text-muted); font-size:.87rem; margin-top:14px; line-height:1.5; }
+  .not-yet-msg.show{ display:block; }
+
+  .verified-card{ display:none; }
+  .verified-card.show{ display:block; }
+  .verified-check{ font-size:2.2rem; margin-bottom:6px; }
+  .verified-title{ font-size:1.15rem; font-weight:800; color: var(--success-soft); margin:0 0 12px; }
+  .verified-details{ font-family:var(--mono); font-size:.82rem; color:var(--text-muted); line-height:1.8; }
+  .verified-details b{ color:var(--text); }
+  .link-btn{
+    background:none; border:none; color:var(--blue-soft); font-size:.85rem;
+    font-family:inherit; padding:12px 0 2px; cursor:pointer; text-decoration:underline;
+  }
+
+  .already-banner{
+    display:none; align-items:flex-start; gap:10px;
+    background: rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.3);
+    color:#A7F3D0; border-radius: var(--r-md); padding:13px 14px; margin-bottom:20px;
+    font-size:.85rem; line-height:1.5;
+  }
+  .already-banner.show{ display:flex; }
+  .already-banner button{
+    background:none; border:none; color:var(--gold); font-weight:700; font-size:.85rem;
+    padding:0; cursor:pointer; text-decoration:underline; font-family:inherit;
+  }
+
+  footer.trust{
+    text-align:center; color:var(--text-faint); font-size:.75rem;
+    padding: 18px 0 6px; line-height:1.6;
+  }
+
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translate(-50%, 20px);
+    background:#12182B; border:1px solid var(--panel-border); color:var(--text);
+    padding:12px 18px; border-radius: 999px; font-size:.86rem;
+    max-width:88vw; text-align:center; opacity:0; pointer-events:none;
+    transition: opacity .25s ease, transform .25s ease;
+    z-index:50; box-shadow: 0 12px 28px -10px rgba(0,0,0,0.6);
+  }
+  .toast.show{ opacity:1; transform:translate(-50%, 0); }
+
+  :focus-visible{ outline:2px solid var(--blue-soft); outline-offset:2px; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg" aria-hidden="true"></div>
+
+<div class="app-shell">
+  <main id="app">
+
+    <!-- SCREEN 1: WELCOME -->
+    <section class="screen active" data-screen="welcome">
+      <div class="welcome-hero">
+        <div class="badge-ring"><span>🎓</span></div>
+        <p class="greet">Welcome 👋</p>
+        <h1 class="college-name">Government Polytechnic College, <span class="place">Perundurai</span></h1>
+        <p class="tagline">Annual fee payment &amp; receipt portal</p>
+      </div>
+      <button class="btn btn-primary" id="btnWelcomeNext" type="button">NEXT →</button>
+      <footer class="trust">🔒 Works fully offline · Your data stays on this device</footer>
+    </section>
+
+    <!-- SCREEN 2: ANNUAL FEE + STUDENT DETAILS -->
+    <section class="screen" data-screen="fee">
+      <button class="back-btn" id="btnBackToWelcome" type="button">‹ Back</button>
+
+      <div class="steps" aria-hidden="true">
+        <div class="seg current"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+      </div>
+      <div class="step-labels" aria-hidden="true">
+        <span class="current">Details &amp; fee</span><span>Payment</span><span>Confirm</span>
+      </div>
+
+      <div class="already-banner" id="alreadyBanner">
+        <span>✅</span>
+        <div>
+          <span id="alreadyBannerText"></span>
+          <br><button type="button" id="btnViewStatus">View payment status</button>
+        </div>
+      </div>
+
+      <h1 class="screen-title">Annual College Fee</h1>
+      <p class="screen-sub">Please confirm your details below before paying.</p>
+
+      <div class="fee-block">
+        <div class="fee-amount">₹2,100</div>
+        <div class="fee-year">Academic Year: 2026–27</div>
+      </div>
+
+      <div class="card">
+        <h2>Student details</h2>
+        <p class="hint">Used only for your local receipt and payment verification.</p>
+
+        <div class="field">
+          <label for="inpName">Full name</label>
+          <input type="text" id="inpName" placeholder="e.g. Ragupravin S" autocomplete="name">
+        </div>
+
+        <div class="field">
+          <label for="inpReg">Register number</label>
+          <input type="text" id="inpReg" placeholder="e.g. 71123xxxxxx" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label for="selDept">Department</label>
+          <select id="selDept">
+            <option value="">Select department</option>
+            <option>Electrical and Electronics Engineering</option>
+            <option>Electronics and Communication Engineering</option>
+            <option>Mechanical Engineering</option>
+            <option>Civil Engineering</option>
+            <option>Computer Engineering</option>
+            <option>Automobile Engineering</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="selYear">Year</label>
+            <select id="selYear">
+              <option value="">Select</option>
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="inpSection">Section</label>
+            <input type="text" id="inpSection" placeholder="e.g. A" maxlength="3">
+          </div>
+        </div>
+
+        <p class="form-error" id="feeFormError"></p>
+      </div>
+
+      <button class="btn btn-pay" id="btnGoToPay" type="button">💳 PAY ₹2,100</button>
+    </section>
+
+    <!-- SCREEN 3: PAYMENT -->
+    <section class="screen" data-screen="payment">
+      <button class="back-btn" id="btnBackToFee" type="button">‹ Back</button>
+
+      <div class="steps" aria-hidden="true">
+        <div class="seg done"></div>
+        <div class="seg current"></div>
+        <div class="seg"></div>
+      </div>
+      <div class="step-labels" aria-hidden="true">
+        <span>Details</span><span class="current">Payment</span><span>Confirm</span>
+      </div>
+
+      <h1 class="screen-title">Choose how you'd like to pay</h1>
+      <div class="pay-summary" id="paySummary"></div>
+
+      <div class="warn-banner" id="upiWarnBanner" style="display:none;">
+        <span>⚠️</span>
+        <span>UPI ID not set up yet by the college administrator. UPI buttons below won't work until <code style="font-family:var(--mono);">COLLEGE_UPI_ID</code> is set in this file. Please use bank transfer or the QR code instead.</span>
+      </div>
+
+      <div class="upi-grid">
+        <button class="upi-btn gpay" type="button" data-method="Google Pay"><span class="em">🟢</span>Google Pay</button>
+        <button class="upi-btn phonepe" type="button" data-method="PhonePe"><span class="em">🔵</span>PhonePe</button>
+        <button class="upi-btn paytm" type="button" data-method="Paytm"><span class="em">🟣</span>Paytm</button>
+        <button class="upi-btn other" type="button" data-method="Other UPI App"><span class="em">💳</span>Other UPI Apps</button>
+      </div>
+
+      <div class="fallback-msg" id="upiFallbackMsg">
+        UPI app could not be opened automatically. Please use another UPI app or scan the official college QR code.
+      </div>
+
+      <div class="divider">or pay by bank transfer</div>
+
+      <div class="ledger">
+        <div class="ledger-row">
+          <div class="ledger-label">Bank name</div>
+          <div class="ledger-value">Indian Overseas Bank</div>
+        </div>
+        <div class="ledger-row">
+          <div class="ledger-label">Account number</div>
+          <div class="ledger-value">090301000070001</div>
+          <button class="copy-btn" type="button" data-copy="090301000070001">Copy Account Number</button>
+        </div>
+        <div class="ledger-row">
+          <div class="ledger-label">IFSC code</div>
+          <div class="ledger-value">IOBA0000903</div>
+          <button class="copy-btn" type="button" data-copy="IOBA0000903">Copy IFSC Code</button>
+        </div>
+      </div>
+
+      <div class="qr-section">
+        <h2 style="font-size:1rem; margin:0 0 12px;">📱 Scan to Pay</h2>
+        <div class="qr-frame">
+          <img id="qrImage" src="college-upi-qr.png" alt="Official college UPI QR code">
+          <div class="qr-missing" id="qrMissing" style="display:none;">
+            Official QR image not added yet.<br>
+            Place a file named <code>college-upi-qr.png</code> in the same folder as this page.
+          </div>
+        </div>
+      </div>
+
+      <div class="card status-card" id="paymentStatusCard">
+        <h2>Have you completed the payment?</h2>
+        <p class="hint">This won't be assumed automatically — please confirm yourself.</p>
+        <div class="status-actions">
+          <button class="btn btn-pay btn-sm" id="btnPaidYes" type="button">Yes, I Paid</button>
+          <button class="btn btn-ghost btn-sm" id="btnPaidNotYet" type="button">Not Yet</button>
+        </div>
+
+        <p class="not-yet-msg" id="notYetMsg">No worries. Complete the payment whenever you're ready, then come back and tap "Yes, I Paid".</p>
+
+        <form class="ref-form" id="refForm">
+          <div class="field" style="margin-top:14px;">
+            <label for="inpRef">UPI Transaction / Reference Number</label>
+            <input type="text" id="inpRef" placeholder="e.g. 402917xxxxxx" autocomplete="off">
+          </div>
+          <p class="form-error" id="refFormError"></p>
+          <button class="btn btn-primary btn-sm" type="submit">Submit for verification</button>
+        </form>
+
+        <div class="verified-card" id="verifiedCard">
+          <div class="verified-check">✅</div>
+          <p class="verified-title">Payment marked for verification ✓</p>
+          <div class="verified-details" id="verifiedDetails"></div>
+          <button class="link-btn" id="btnEditRef" type="button">Edit reference number</button>
+        </div>
+      </div>
+
+      <footer class="trust">The college office will verify your payment against this reference number.<br>
+      Central records require the Supabase configuration in this file.</footer>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============================================================
+   CENTRAL PAYMENT RECORDING
+   1) Create a Supabase project.
+   2) Put your Project URL and anon key below.
+   3) Run supabase.sql supplied with this package.
+   ============================================================ */
+var SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+var SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+var supabaseClient = null;
+if (window.supabase && SUPABASE_URL.indexOf("YOUR_") !== 0 && SUPABASE_ANON_KEY.indexOf("YOUR_") !== 0) {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+</script>
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     ADMIN CONFIGURATION
+     Replace the placeholder below with the college's verified,
+     official UPI ID before publishing this page. Do not use an
+     unverified or personal UPI ID.
+  ============================================================ */
+  var COLLEGE_UPI_ID = "ENTER_VERIFIED_COLLEGE_UPI_ID_HERE";
+  var COLLEGE_NAME   = "Government Polytechnic College Perundurai";
+  var FEE_AMOUNT     = "2100";
+  var FEE_CURRENCY   = "INR";
+  var FEE_NOTE       = "Annual College Fee 2026-27";
+  var ACADEMIC_YEAR  = "2026-27";
+  /* To enable the QR fallback, place an image file named
+     "college-upi-qr.png" (the official college-issued UPI QR)
+     in the same folder as this index.html file. */
+
+  var STORAGE_KEY = "gpc_perundurai_fee_2026_27";
+
+  /* ---------------- storage helpers ---------------- */
+  function loadData(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    }catch(e){ return {}; }
+  }
+  function saveData(patch){
+    var merged;
+    try{
+      var current = loadData();
+      merged = Object.assign({}, current, patch, { updatedAt: new Date().toISOString() });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+    }catch(e){
+      merged = Object.assign({}, patch);
+      showToast("Could not save on this device — local storage may be disabled.");
+    }
+    return merged;
+  }
+
+  /* ---------------- small utilities ---------------- */
+  var toastTimer = null;
+  function showToast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2800);
+  }
+
+  function copyText(text, btn){
+    function done(){
+      var original = btn.textContent;
+      btn.textContent = "Copied ✓";
+      btn.classList.add("copied");
+      setTimeout(function(){
+        btn.textContent = original;
+        btn.classList.remove("copied");
+      }, 1700);
+    }
+    function fallback(){
+      try{
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        done();
+      }catch(e){
+        showToast("Couldn't copy automatically. Value: " + text);
+      }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  /* ---------------- screen navigation ---------------- */
+  var screens = document.querySelectorAll(".screen");
+  function showScreen(name){
+    screens.forEach(function(s){ s.classList.toggle("active", s.dataset.screen === name); });
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById("btnWelcomeNext").addEventListener("click", function(){
+    showScreen("fee");
+  });
+  document.getElementById("btnBackToWelcome").addEventListener("click", function(){
+    showScreen("welcome");
+  });
+  document.getElementById("btnBackToFee").addEventListener("click", function(){
+    showScreen("fee");
+  });
+
+  /* ---------------- student details form ---------------- */
+  var inpName = document.getElementById("inpName");
+  var inpReg = document.getElementById("inpReg");
+  var selDept = document.getElementById("selDept");
+  var selYear = document.getElementById("selYear");
+  var inpSection = document.getElementById("inpSection");
+  var feeFormError = document.getElementById("feeFormError");
+
+  function prefillStudentForm(data){
+    if (data.name) inpName.value = data.name;
+    if (data.regNo) inpReg.value = data.regNo;
+    if (data.department) selDept.value = data.department;
+    if (data.year) selYear.value = data.year;
+    if (data.section) inpSection.value = data.section;
+  }
+
+  document.getElementById("btnGoToPay").addEventListener("click", function(){
+    var data = {
+      name: inpName.value.trim(),
+      regNo: inpReg.value.trim(),
+      department: selDept.value,
+      year: selYear.value,
+      section: inpSection.value.trim(),
+      academicYear: ACADEMIC_YEAR
+    };
+    if (!data.name || !data.regNo || !data.department || !data.year || !data.section){
+      feeFormError.textContent = "Please fill in all student details before proceeding.";
+      feeFormError.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    feeFormError.textContent = "";
+    saveData(data);
+    renderPaySummary(data);
+    showScreen("payment");
+  });
+
+  function renderPaySummary(data){
+    var el = document.getElementById("paySummary");
+    el.innerHTML =
+      "Amount: <b>₹" + FEE_AMOUNT + "</b> &nbsp;·&nbsp; " +
+      "Name: <b>" + escapeHtml(data.name || "-") + "</b><br>" +
+      "Reg. No: <b>" + escapeHtml(data.regNo || "-") + "</b> &nbsp;·&nbsp; " +
+      "Dept: <b>" + escapeHtml(data.department || "-") + "</b>";
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(c){
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+    });
+  }
+
+  /* ---------------- UPI configuration check ---------------- */
+  function isUpiConfigured(){
+    return COLLEGE_UPI_ID && COLLEGE_UPI_ID.indexOf("ENTER_") !== 0;
+  }
+  if (!isUpiConfigured()){
+    document.getElementById("upiWarnBanner").style.display = "flex";
+  }
+
+  function buildUpiUrl(){
+    var params = [
+      "pa=" + encodeURIComponent(COLLEGE_UPI_ID),
+      "pn=" + encodeURIComponent(COLLEGE_NAME),
+      "am=" + encodeURIComponent(FEE_AMOUNT),
+      "cu=" + encodeURIComponent(FEE_CURRENCY),
+      "tn=" + encodeURIComponent(FEE_NOTE)
+    ].join("&");
+    return "upi://pay?" + params;
+  }
+
+  /* ---------------- UPI payment attempt ---------------- */
+  var upiAttemptAt = null;
+  var fallbackMsgEl = document.getElementById("upiFallbackMsg");
+
+  function attemptUpi(method){
+    saveData({ selectedMethod: method });
+    fallbackMsgEl.classList.remove("show");
+
+    if (!isUpiConfigured()){
+      showToast("UPI ID not set up yet. Please use bank transfer or scan the QR code below.");
+      return;
+    }
+
+    upiAttemptAt = Date.now();
+    window.location.href = buildUpiUrl();
+
+    setTimeout(function(){
+      if (upiAttemptAt && document.visibilityState === "visible"){
+        fallbackMsgEl.classList.add("show");
+        upiAttemptAt = null;
+      }
+    }, 1400);
+  }
+
+  document.querySelectorAll(".upi-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      attemptUpi(btn.dataset.method);
+    });
+  });
+
+  function handleReturnToPage(){
+    if (upiAttemptAt){
+      var elapsed = Date.now() - upiAttemptAt;
+      if (elapsed > 700){
+        upiAttemptAt = null;
+        var card = document.getElementById("paymentStatusCard");
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        card.classList.add("pulse");
+        setTimeout(function(){ card.classList.remove("pulse"); }, 1600);
+      }
+    }
+  }
+  document.addEventListener("visibilitychange", function(){
+    if (document.visibilityState === "visible") handleReturnToPage();
+  });
+  window.addEventListener("pageshow", handleReturnToPage);
+
+  /* ---------------- bank detail copy buttons ---------------- */
+  document.querySelectorAll(".copy-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      copyText(btn.dataset.copy, btn);
+    });
+  });
+
+  /* ---------------- QR image fallback ---------------- */
+  document.getElementById("qrImage").addEventListener("error", function(){
+    this.style.display = "none";
+    document.getElementById("qrMissing").style.display = "block";
+  });
+
+  /* ---------------- payment status: yes / not yet ---------------- */
+  var refForm = document.getElementById("refForm");
+  var notYetMsg = document.getElementById("notYetMsg");
+  var verifiedCard = document.getElementById("verifiedCard");
+  var refFormError = document.getElementById("refFormError");
+  var inpRef = document.getElementById("inpRef");
+
+  document.getElementById("btnPaidYes").addEventListener("click", function(){
+    verifiedCard.classList.remove("show");
+    notYetMsg.classList.remove("show");
+    refForm.classList.add("show");
+    inpRef.focus();
+  });
+
+  document.getElementById("btnPaidNotYet").addEventListener("click", function(){
+    saveData({ paymentStatus: "not_yet" });
+    refForm.classList.remove("show");
+    verifiedCard.classList.remove("show");
+    notYetMsg.classList.add("show");
+  });
+
+  refForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var val = inpRef.value.trim();
+    if (!val){
+      refFormError.textContent = "Please enter your transaction / reference number.";
+      return;
+    }
+    refFormError.textContent = "";
+    var data = saveData({
+      paymentStatus: "marked_for_verification",
+      upiReference: val,
+      verifiedAt: new Date().toISOString()
+    });
+
+    /* Send the submitted payment details to the central admin database.
+       The UPI app itself does not give this webpage private payer/bank data.
+       The payer enters the transaction/reference number after payment. */
+    if (supabaseClient) {
+      supabaseClient.from("payment_submissions").insert([{
+        name: data.name || "",
+        register_number: data.regNo || "",
+        department: data.department || "",
+        year: data.year || "",
+        section: data.section || "",
+        academic_year: data.academicYear || ACADEMIC_YEAR,
+        amount: Number(FEE_AMOUNT),
+        payment_method: data.selectedMethod || "UPI",
+        upi_reference: data.upiReference || "",
+        status: "marked_for_verification"
+      }]).then(function(result){
+        if (result.error) {
+          console.error("Central payment save failed:", result.error);
+          showToast("Saved on this phone, but central upload failed. Check internet/config.");
+        } else {
+          showToast("Payment details sent to admin successfully.");
+        }
+      });
+    } else {
+      showToast("Central database is not configured yet.");
+    }
+
+    renderVerifiedCard(data);
+    refForm.classList.remove("show");
+    notYetMsg.classList.remove("show");
+    verifiedCard.classList.add("show");
+    verifiedCard.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  document.getElementById("btnEditRef").addEventListener("click", function(){
+    verifiedCard.classList.remove("show");
+    refForm.classList.add("show");
+    inpRef.focus();
+  });
+
+  function renderVerifiedCard(data){
+    var el = document.getElementById("verifiedDetails");
+    el.innerHTML =
+      "Name: <b>" + escapeHtml(data.name || "-") + "</b><br>" +
+      "Reg. No: <b>" + escapeHtml(data.regNo || "-") + "</b><br>" +
+      "Amount: <b>₹" + FEE_AMOUNT + "</b><br>" +
+      "Reference No: <b>" + escapeHtml(data.upiReference || "-") + "</b>";
+  }
+
+  /* ---------------- "already marked" banner on fee screen ---------------- */
+  function renderAlreadyBanner(data){
+    var banner = document.getElementById("alreadyBanner");
+    if (data.paymentStatus === "marked_for_verification" && data.upiReference){
+      var when = "";
+      try{ when = new Date(data.verifiedAt).toLocaleDateString(); }catch(e){}
+      document.getElementById("alreadyBannerText").textContent =
+        "A payment was already marked for verification" + (when ? " on " + when : "") +
+        " (Ref: " + data.upiReference + ").";
+      banner.classList.add("show");
+    }
+  }
+  document.getElementById("btnViewStatus").addEventListener("click", function(){
+    showScreen("payment");
+    document.getElementById("paymentStatusCard").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  /* ---------------- init on load ---------------- */
+  (function init(){
+    var data = loadData();
+    prefillStudentForm(data);
+    renderPaySummary(data);
+    renderAlreadyBanner(data);
+
+    if (data.paymentStatus === "marked_for_verification" && data.upiReference){
+      renderVerifiedCard(data);
+      verifiedCard.classList.add("show");
+    } else if (data.paymentStatus === "not_yet"){
+      notYetMsg.classList.add("show");
+    }
+  })();
+
+})();
+</script>
+</body>
+</html>
